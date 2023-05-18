@@ -8,6 +8,7 @@ import {
 } from './workTags';
 import { NoFlags, Update } from './fiberFlags';
 import { appendInitialChild } from 'hostConfig';
+import { updateFiberProps } from './../../react-dom/src/SyntheticEvent';
 
 function markUpdate(fiber: FiberNode) {
 	fiber.flags |= Update;
@@ -23,13 +24,15 @@ export const completeWork = (wip: FiberNode) => {
 		case HostComponent:
 			if (current !== null && wip.stateNode) {
 				// update
+				// 1. props 是否变化 {onClick: xxx} -> {onClick: xx}
+				// 2. 变了 Update Flag
+				// className Style
+				updateFiberProps(wip.stateNode, newProps);
 			} else {
-				// 首屏渲染
-
+				// mount
 				// 1. 构建dom
-
 				// const instance = createInstance(wip.type, newProps);
-				const instance = createInstance(wip.type);
+				const instance = createInstance(wip.type, newProps);
 
 				// 2. 将dom插入到dom树中
 				appendAllChildren(instance, wip);

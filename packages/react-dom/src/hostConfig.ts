@@ -1,14 +1,17 @@
 import { FiberNode } from './../../react-reconciler/src/fiber';
 import { HostText } from './../../react-reconciler/src/workTags';
+import { DOMElement, updateFiberProps } from './SyntheticEvent';
+import { Props } from 'shared/ReactTypes';
 
 export type Container = Element;
 export type Instance = Element;
 export type TextInstance = Text;
 
 // export const createInstance = (type: string, props: any): Intance
-export const createInstance = (type: string): Instance => {
-	const element = document.createElement(type);
-	return element;
+export const createInstance = (type: string, props: Props): Instance => {
+	const element = document.createElement(type) as unknown;
+	updateFiberProps(element as DOMElement, props);
+	return element as DOMElement;
 };
 
 export const appendInitialChild = (
@@ -27,7 +30,7 @@ export const appendChildToContainer = appendInitialChild;
 export function commitUpdate(fiber: FiberNode) {
 	switch (fiber.tag) {
 		case HostText:
-			const text = fiber.memoizedProps.content;
+			const text = fiber.memoizedProps?.content;
 			return commitTextUpdate(fiber.stateNode, text);
 
 		default:
@@ -47,4 +50,12 @@ export function removeChild(
 	container: Container
 ) {
 	container.removeChild(child);
+}
+
+export function insertChildToContainer(
+	child: Instance,
+	container: Container,
+	before: Instance
+) {
+	container.insertBefore(child, before);
 }
